@@ -36,7 +36,7 @@ src/
 ### DoctrineRepository
 
 ```php
-use Alexandrebulete\DddDoctrineBridge\DoctrineRepository;
+use AlexandreBulete\DddDoctrineBridge\DoctrineRepository;
 use App\Post\Domain\Entity\Post;
 
 class DoctrinePostRepository extends DoctrineRepository
@@ -62,7 +62,7 @@ class DoctrinePostRepository extends DoctrineRepository
 Create custom Doctrine types for your Value Objects:
 
 ```php
-use Alexandrebulete\DddDoctrineBridge\Type\GuidType;
+use AlexandreBulete\DddDoctrineBridge\Type\GuidType;
 use App\Post\Domain\ValueObject\PostId;
 
 class PostIdType extends GuidType

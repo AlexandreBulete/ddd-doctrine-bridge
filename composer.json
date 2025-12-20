@@ -17,12 +17,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Alexandrebulete\\DddDoctrineBridge\\": "src/"
+            "AlexandreBulete\\DddDoctrineBridge\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Alexandrebulete\\DddDoctrineBridge\\Tests\\": "tests/"
+            "AlexandreBulete\\DddDoctrineBridge\\Tests\\": "tests/"
         }
     },
     "minimum-stability": "stable",

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Alexandrebulete\DddDoctrineBridge\Type;
+namespace AlexandreBulete\DddDoctrineBridge\Type;
 
-use Alexandrebulete\DddDoctrineBridge\Type\Convertor\AsStringConvertor;
+use AlexandreBulete\DddDoctrineBridge\Type\Convertor\AsStringConvertor;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 abstract class TextType extends BaseType

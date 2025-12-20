@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Alexandrebulete\DddDoctrineBridge\Type\Convertor;
+namespace AlexandreBulete\DddDoctrineBridge\Type\Convertor;
 
-use Alexandrebulete\DddFoundation\Domain\ValueObject\IdentifierVO;
+use AlexandreBulete\DddFoundation\Domain\ValueObject\IdentifierVO;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 trait AsIdentifierConvertor

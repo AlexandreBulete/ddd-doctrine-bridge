@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Alexandrebulete\DddDoctrineBridge\Type;
+namespace AlexandreBulete\DddDoctrineBridge\Type;
 
 use Doctrine\DBAL\Types\Type;
 

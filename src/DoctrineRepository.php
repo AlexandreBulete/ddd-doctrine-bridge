@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Alexandrebulete\DddDoctrineBridge;
+namespace AlexandreBulete\DddDoctrineBridge;
 
-use Alexandrebulete\DddFoundation\Domain\Repository\PaginatorInterface;
-use Alexandrebulete\DddFoundation\Domain\Repository\RepositoryInterface;
+use AlexandreBulete\DddFoundation\Domain\Repository\PaginatorInterface;
+use AlexandreBulete\DddFoundation\Domain\Repository\RepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Webmozart\Assert\Assert;

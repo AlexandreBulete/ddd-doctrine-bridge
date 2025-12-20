@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Alexandrebulete\DddDoctrineBridge;
+namespace AlexandreBulete\DddDoctrineBridge;
 
-use Alexandrebulete\DddFoundation\Domain\Repository\PaginatorInterface;
+use AlexandreBulete\DddFoundation\Domain\Repository\PaginatorInterface;
 
 /**
  * Paginator simplified that works with custom Doctrine types.
