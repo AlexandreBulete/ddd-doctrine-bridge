@@ -1,0 +1,31 @@
+{
+    "name": "alexandrebulete/ddd-doctrine-bridge",
+    "description": "Doctrine ORM bridge for DDD Foundation - Pure PHP, no framework dependency",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alexandre Bulete"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "alexandrebulete/ddd-foundation": "^1.0",
+        "doctrine/orm": "^3.6",
+        "doctrine/dbal": "^3.10",
+        "webmozart/assert": "^1.11"
+    },
+    "autoload": {
+        "psr-4": {
+            "Alexandrebulete\\DddDoctrineBridge\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Alexandrebulete\\DddDoctrineBridge\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
+
