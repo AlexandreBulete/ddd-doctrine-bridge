@@ -30,7 +30,15 @@ trait AsIdentifierConvertor
 
     public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
-        return $value?->toString();
+        if (is_string($value) || is_null($value)) {
+            return $value;
+        }
+
+        if ($value instanceof IdentifierVO) {
+            return $value->toRfc4122();
+        }
+
+        throw new \InvalidArgumentException('Invalid value type: ' . gettype($value));
     }
 }
 
