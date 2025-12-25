@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace AlexandreBulete\DddDoctrineBridge\Type\Convertor;
 
-use AlexandreBulete\DddFoundation\Domain\ValueObject\IdentifierVO;
+use Symfony\Component\Uid\AbstractUid;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use AlexandreBulete\DddFoundation\Domain\ValueObject\IdentifierVO;
 
 trait AsIdentifierConvertor
 {
@@ -35,6 +36,10 @@ trait AsIdentifierConvertor
         }
 
         if ($value instanceof IdentifierVO) {
+            $value = $value->value();
+        }
+
+        if ($value instanceof AbstractUid) {
             return $value->toRfc4122();
         }
 
