@@ -105,25 +105,26 @@ abstract class DoctrineRepository implements RepositoryInterface
     public function filter(array $filter): static
     {
         $cloned = clone $this;
-        foreach ($filter as $key => $criterion) {
-            $value = is_array($criterion) ? ($criterion['value'] ?? null) : $criterion;
 
-            if (null === $value || '' === $value) {
+        foreach ($filter as $key => $criterion) {
+            $type  = is_array($criterion) ? ($criterion['type'] ?? 'equals') : 'equals';
+            $value = is_array($criterion) ? ($criterion['value'] ?? null) : $criterion;
+    
+            if ($value === null || $value === '') {
                 continue;
             }
-
-            $cloned->queryBuilder
-                ->andWhere(
-                    $cloned->queryBuilder->expr()->like(
-                        "{$cloned->getAlias()}.{$key}",
-                        ":{$key}"
-                    )
-                )
-                ->setParameter($key, "%{$value}%");
+    
+            $field = sprintf('%s.%s', $cloned->getAlias(), $key);
+            $param = $key;
+    
+            $cloned->queryBuilder = (new ComparisonBuilder($cloned->queryBuilder))
+                ->build($type, $field, $param, $value);
         }
 
+        // dd($cloned->queryBuilder->getQuery()->getSQL());
+    
         return $cloned;
-    }
+    }    
 
     public function orderBy(string $field, string $direction): static
     {
