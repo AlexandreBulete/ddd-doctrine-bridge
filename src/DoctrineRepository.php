@@ -120,8 +120,6 @@ abstract class DoctrineRepository implements RepositoryInterface
             $cloned->queryBuilder = (new ComparisonBuilder($cloned->queryBuilder))
                 ->build($type, $field, $param, $value);
         }
-
-        // dd($cloned->queryBuilder->getQuery()->getSQL());
     
         return $cloned;
     }    
