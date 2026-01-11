@@ -3,7 +3,6 @@
 namespace AlexandreBulete\DddDoctrineBridge;
 
 use AlexandreBulete\DddFoundation\Domain\Model\RecordsEvents;
-use AlexandreBulete\DddFoundation\Application\Event\EventDispatcherInterface;
 
 /**
  * Requires the class to have a property: EventDispatcherInterface $eventDispatcher
