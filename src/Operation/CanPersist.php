@@ -3,13 +3,10 @@
 namespace AlexandreBulete\DddDoctrineBridge\Operation;
 
 use Doctrine\ORM\EntityManagerInterface;
-use AlexandreBulete\DddDoctrineBridge\DispatchesDomainEvents;
 use AlexandreBulete\DddDoctrineBridge\Enum\WhenDispatchDomainEventsEnum;
 
 trait CanPersist
 {
-    use DispatchesDomainEvents;
-
     protected EntityManagerInterface $em;
     
     protected function persistAndFlush(

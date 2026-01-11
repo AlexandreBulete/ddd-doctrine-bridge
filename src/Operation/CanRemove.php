@@ -4,12 +4,9 @@ namespace AlexandreBulete\DddDoctrineBridge\Operation;
 
 use Doctrine\ORM\EntityManagerInterface;
 use AlexandreBulete\DddDoctrineBridge\Enum\WhenDispatchDomainEventsEnum;
-use AlexandreBulete\DddDoctrineBridge\DispatchesDomainEvents;
 
 trait CanRemove
 {
-    use DispatchesDomainEvents;
-
     protected EntityManagerInterface $em;
     
     protected function removeAndFlush(
