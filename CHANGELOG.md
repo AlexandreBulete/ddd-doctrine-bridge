@@ -1,3 +1,16 @@
+## [1.1.2] - 2026-01-11
+
+### 🐛 Bug Fixes
+
+- Remove property declaration from trait to avoid conflict
+
+### 🚜 Refactor
+
+- Rm unused class
+
+### 📚 Documentation
+
+- Update CHANGELOG.md for 1.1.1
 ## [1.1.1] - 2026-01-11
 
 ### 🐛 Bug Fixes
