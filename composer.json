@@ -10,7 +10,7 @@
     ],
     "require": {
         "php": "^8.2",
-        "alexandrebulete/ddd-foundation": "^1.0",
+        "alexandrebulete/ddd-foundation": "^1.1",
         "doctrine/orm": "^3.6",
         "doctrine/dbal": "^3.10",
         "webmozart/assert": "^1.11"
