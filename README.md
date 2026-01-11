@@ -21,6 +21,18 @@ composer require alexandrebulete/ddd-doctrine-bundle
 src/
 ├── DoctrineRepository.php
 ├── DoctrinePaginator.php
+├── DispatchesDomainEvents.php
+├── Capability/
+│   ├── AsReadable.php          # CanFindById + CanFindAll
+│   ├── AsMutable.php           # CanPersist + CanRemove + DispatchesDomainEvents
+│   └── AsCrudable.php          # AsReadable + AsMutable
+├── Operation/
+│   ├── CanPersist.php          # persistAndFlush()
+│   ├── CanRemove.php           # removeAndFlush()
+│   ├── CanFindById.php         # findEntityById()
+│   └── CanFindAll.php          # findAllEntities()
+├── Enum/
+│   └── WhenDispatchDomainEventsEnum.php
 └── Type/
     ├── BaseType.php
     ├── GuidType.php
@@ -31,33 +43,154 @@ src/
         └── AsStringConvertor.php
 ```
 
-## Usage
+## Repository Traits
 
-### DoctrineRepository
+Granular traits to compose your repositories with only the capabilities you need.
+
+### Capability Traits (High-level)
+
+| Trait | Includes | Use case |
+|-------|----------|----------|
+| `AsReadable` | CanFindById, CanFindAll | Read-only repositories |
+| `AsMutable` | CanPersist, CanRemove, DispatchesDomainEvents | Write-only repositories |
+| `AsCrudable` | AsReadable, AsMutable | Full CRUD repositories |
+
+### Operation Traits (Atomic)
+
+| Trait | Method | Description |
+|-------|--------|-------------|
+| `CanPersist` | `persistAndFlush()` | Persist and flush entity |
+| `CanRemove` | `removeAndFlush()` | Remove and flush entity |
+| `CanFindById` | `findEntityById()` | Find entity by ID |
+| `CanFindAll` | `findAllEntities()` | Find all entities |
+
+### Usage Examples
+
+#### Full CRUD Repository
 
 ```php
 use AlexandreBulete\DddDoctrineBridge\DoctrineRepository;
-use App\Post\Domain\Entity\Post;
+use AlexandreBulete\DddDoctrineBridge\Capability\AsCrudable;
+use AlexandreBulete\DddFoundation\Application\Event\EventDispatcherInterface;
 
-class DoctrinePostRepository extends DoctrineRepository
+class DoctrinePostRepository extends DoctrineRepository implements PostRepositoryInterface
 {
-    public function __construct(EntityManagerInterface $em)
+    use AsCrudable;
+
+    public function __construct(
+        EntityManagerInterface $em,
+        private readonly EventDispatcherInterface $eventDispatcher,
+    ) {
+        parent::__construct($em, Post::class, 'post');
+    }
+
+    public function save(Post $post): void
     {
-        parent::__construct($em, Post::class, 'p');
+        $this->persistAndFlush(
+            entity: $post,
+            dispatchEvents: true,
+            whenDispatchEvents: WhenDispatchDomainEventsEnum::AFTER,
+        );
+    }
+
+    public function delete(Post $post): void
+    {
+        $this->removeAndFlush($post);
     }
 
     public function findById(IdentifierVO $id): ?Post
     {
-        return $this->query()
-            ->andWhere('p.id = :id')
-            ->setParameter('id', $id->toString())
-            ->getQuery()
-            ->getOneOrNullResult();
+        return $this->findEntityById(Post::class, $id->toRfc4122());
+    }
+
+    public function findAll(): array
+    {
+        return $this->findAllEntities();
     }
 }
 ```
 
-### Custom Doctrine Types
+#### Read-Only Repository
+
+```php
+use AlexandreBulete\DddDoctrineBridge\DoctrineRepository;
+use AlexandreBulete\DddDoctrineBridge\Capability\AsReadable;
+
+class DoctrineCountryRepository extends DoctrineRepository
+{
+    use AsReadable;
+
+    public function __construct(EntityManagerInterface $em)
+    {
+        parent::__construct($em, Country::class, 'country');
+    }
+
+    public function findById(IdentifierVO $id): ?Country
+    {
+        return $this->findEntityById(Country::class, $id->value());
+    }
+
+    public function findAll(): array
+    {
+        return $this->findAllEntities();
+    }
+}
+```
+
+#### Custom Mix (Persist without Delete)
+
+```php
+use AlexandreBulete\DddDoctrineBridge\DoctrineRepository;
+use AlexandreBulete\DddDoctrineBridge\Capability\AsReadable;
+use AlexandreBulete\DddDoctrineBridge\Operation\CanPersist;
+use AlexandreBulete\DddDoctrineBridge\DispatchesDomainEvents;
+
+class DoctrineAuditLogRepository extends DoctrineRepository
+{
+    use AsReadable;
+    use CanPersist;
+    use DispatchesDomainEvents;
+
+    // Can read and create, but NOT delete
+}
+```
+
+## Domain Events
+
+Dispatch domain events from your aggregates after persistence.
+
+### When to Dispatch
+
+```php
+use AlexandreBulete\DddDoctrineBridge\Enum\WhenDispatchDomainEventsEnum;
+
+// Dispatch AFTER flush (recommended - ensures transaction committed)
+$this->persistAndFlush($entity, dispatchEvents: true, whenDispatchEvents: WhenDispatchDomainEventsEnum::AFTER);
+
+// Dispatch BEFORE flush (rare - event dispatched even if flush fails)
+$this->persistAndFlush($entity, dispatchEvents: true, whenDispatchEvents: WhenDispatchDomainEventsEnum::BEFORE);
+```
+
+### Requirements
+
+Your entity must use the `RecordsEvents` trait from `ddd-foundation`:
+
+```php
+use AlexandreBulete\DddFoundation\Domain\Model\RecordsEvents;
+
+class Post
+{
+    use RecordsEvents;
+
+    public function publish(): void
+    {
+        $this->status = 'published';
+        $this->recordEvent(new PostPublished($this->id));
+    }
+}
+```
+
+## Custom Doctrine Types
 
 Create custom Doctrine types for your Value Objects:
 
