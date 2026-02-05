@@ -57,9 +57,9 @@ abstract class DoctrineRepository implements RepositoryInterface
         if (null === $this->page || null === $this->itemsPerPage) {
             return null;
         }
-
         $qb = clone $this->queryBuilder;
         $qb->distinct();
+
         $qb->setFirstResult(($this->page - 1) * $this->itemsPerPage);
         $qb->setMaxResults($this->itemsPerPage);
 
