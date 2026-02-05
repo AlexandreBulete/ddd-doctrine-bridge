@@ -1,3 +1,12 @@
+## [1.1.3] - 2026-02-05
+
+### 💼 Other
+
+- Symfony 8 compatibility
+
+### 📚 Documentation
+
+- Update CHANGELOG.md for 1.1.2
 ## [1.1.2] - 2026-01-11
 
 ### 🐛 Bug Fixes
