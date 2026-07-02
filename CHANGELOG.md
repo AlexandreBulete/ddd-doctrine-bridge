@@ -1,3 +1,12 @@
+## [1.1.4] - 2026-07-02
+
+### 🐛 Bug Fixes
+
+- Add value verification to convert value to db and datetime type
+
+### 📚 Documentation
+
+- Update CHANGELOG.md for 1.1.3
 ## [1.1.3] - 2026-02-05
 
 ### 💼 Other
