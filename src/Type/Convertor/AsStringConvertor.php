@@ -30,7 +30,15 @@ trait AsStringConvertor
 
     public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
-        return $value?->value();
+        if (is_string($value) || is_null($value)) {
+            return $value;
+        }
+
+        if ($value instanceof StringVO) {
+            return $value->value();
+        }
+
+        throw new \InvalidArgumentException('Invalid value type: ' . get_debug_type($value));
     }
 }
 
