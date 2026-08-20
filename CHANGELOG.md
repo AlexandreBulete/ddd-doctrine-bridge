@@ -1,3 +1,13 @@
+## [1.1.5] - 2026-08-20
+
+### 🚀 Features
+
+- Add nullable comparisons
+
+### 📚 Documentation
+
+- Update CHANGELOG.md for 1.1.4
+- Changelog
 ## [1.1.4] - 2026-07-02
 
 ### 🐛 Bug Fixes
