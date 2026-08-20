@@ -109,8 +109,10 @@ abstract class DoctrineRepository implements RepositoryInterface
         foreach ($filter as $key => $criterion) {
             $type  = is_array($criterion) ? ($criterion['type'] ?? 'equals') : 'equals';
             $value = is_array($criterion) ? ($criterion['value'] ?? null) : $criterion;
-    
-            if ($value === null || $value === '') {
+
+            // An empty value means "filter left blank" and is skipped — except
+            // for null-ness assertions, whose whole point is to carry no operand.
+            if (!ComparisonBuilder::isValueless($type) && ($value === null || $value === '')) {
                 continue;
             }
     
