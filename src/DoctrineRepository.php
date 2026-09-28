@@ -22,6 +22,9 @@ abstract class DoctrineRepository implements RepositoryInterface
 
     private QueryBuilder $queryBuilder;
 
+    /**
+     * @param class-string<T> $entityClass
+     */
     public function __construct(
         protected EntityManagerInterface $em,
         string $entityClass,
@@ -32,6 +35,9 @@ abstract class DoctrineRepository implements RepositoryInterface
             ->from($entityClass, $alias);
     }
 
+    /**
+     * @return \Iterator<array-key, T>
+     */
     public function getIterator(): \Iterator
     {
         if (null !== $paginator = $this->paginator()) {
@@ -40,35 +46,52 @@ abstract class DoctrineRepository implements RepositoryInterface
             return;
         }
 
-        yield from $this->queryBuilder->getQuery()->getResult();
+        yield from $this->results($this->queryBuilder);
     }
 
+    /**
+     * @return int<0, max>
+     */
     public function count(): int
     {
-        if (null !== $paginator = $this->paginator()) {
-            return $paginator->getTotalItems();
-        }
-
         return $this->countTotal();
     }
 
+    /**
+     * @return PaginatorInterface<T>|null
+     */
     public function paginator(): ?PaginatorInterface
     {
         if (null === $this->page || null === $this->itemsPerPage) {
             return null;
         }
+        // No DISTINCT: the query selects one root entity and never joins, so a
+        // row cannot come back twice. DISTINCT compared every column instead —
+        // which PostgreSQL rejects outright for a `json` column. Should joins
+        // ever be allowed, a to-many join needs Doctrine's Paginator (ids
+        // first, then entities), not a DISTINCT over the whole row.
         $qb = clone $this->queryBuilder;
-        $qb->distinct();
-
         $qb->setFirstResult(($this->page - 1) * $this->itemsPerPage);
         $qb->setMaxResults($this->itemsPerPage);
 
-        $items = $qb->getQuery()->getResult();
-        $total = $this->countTotal();
-
-        return new DoctrinePaginator($items, $total, $this->page, $this->itemsPerPage);
+        return new DoctrinePaginator($this->results($qb), $this->countTotal(), $this->page, $this->itemsPerPage);
     }
 
+    /**
+     * The query selects the root entity only, so every row is a T — which
+     * Doctrine's untyped getResult() cannot tell PHPStan.
+     *
+     * @return list<T>
+     */
+    private function results(QueryBuilder $qb): array
+    {
+        /** @var list<T> */
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @return int<0, max>
+     */
     private function countTotal(): int
     {
         $alias = $this->getAlias();
@@ -78,9 +101,17 @@ abstract class DoctrineRepository implements RepositoryInterface
 
         $countQb->resetDQLPart('orderBy');
 
-        return (int) $countQb->getQuery()->getSingleScalarResult();
+        $total = $countQb->getQuery()->getSingleScalarResult();
+        if (!is_numeric($total) || (int) $total < 0) {
+            throw new \UnexpectedValueException(sprintf('COUNT() returned %s.', get_debug_type($total)));
+        }
+
+        return (int) $total;
     }
 
+    /**
+     * @return static
+     */
     public function withoutPagination(): static
     {
         $cloned = clone $this;
@@ -90,6 +121,9 @@ abstract class DoctrineRepository implements RepositoryInterface
         return $cloned;
     }
 
+    /**
+     * @return static
+     */
     public function withPagination(int $page, int $itemsPerPage): static
     {
         Assert::positiveInteger($page);
@@ -102,6 +136,11 @@ abstract class DoctrineRepository implements RepositoryInterface
         return $cloned;
     }
 
+    /**
+     * @param array<string, mixed> $filter field => value, or field => {type, value}
+     *
+     * @return static
+     */
     public function filter(array $filter): static
     {
         $cloned = clone $this;
@@ -110,22 +149,29 @@ abstract class DoctrineRepository implements RepositoryInterface
             $type  = is_array($criterion) ? ($criterion['type'] ?? 'equals') : 'equals';
             $value = is_array($criterion) ? ($criterion['value'] ?? null) : $criterion;
 
+            if (!is_string($type)) {
+                throw new \InvalidArgumentException(sprintf('Filter type for "%s" must be a string, %s given.', $key, get_debug_type($type)));
+            }
+
             // An empty value means "filter left blank" and is skipped — except
             // for null-ness assertions, whose whole point is to carry no operand.
             if (!ComparisonBuilder::isValueless($type) && ($value === null || $value === '')) {
                 continue;
             }
-    
+
             $field = sprintf('%s.%s', $cloned->getAlias(), $key);
             $param = $key;
-    
+
             $cloned->queryBuilder = (new ComparisonBuilder($cloned->queryBuilder))
                 ->build($type, $field, $param, $value);
         }
-    
-        return $cloned;
-    }    
 
+        return $cloned;
+    }
+
+    /**
+     * @return static
+     */
     public function orderBy(string $field, string $direction): static
     {
         Assert::notEmpty($field);

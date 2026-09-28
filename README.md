@@ -211,3 +211,19 @@ class PostIdType extends GuidType
 - **VarcharType**: For string value objects (VARCHAR)
 - **TextType**: For string value objects (TEXT/CLOB)
 
+
+## Development
+
+```bash
+composer install
+composer qa          # phpstan (max + strict rules) then phpunit
+```
+
+The integration tests run on SQLite in memory by default. Point them at a real
+database with `DDD_TEST_DATABASE_URL` — CI runs them on PostgreSQL and MySQL
+too, because the platforms disagree on exactly the SQL this bridge generates:
+
+```bash
+DDD_TEST_DATABASE_URL="postgresql://user:pass@127.0.0.1:5432/test?serverVersion=17" composer test
+DDD_TEST_DATABASE_URL="mysql://user:pass@127.0.0.1:3306/test?serverVersion=8.4" composer test
+```
