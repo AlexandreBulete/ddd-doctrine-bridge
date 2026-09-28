@@ -1,3 +1,20 @@
+## [1.2.0] - 2026-09-28
+
+### 🐛 Bug Fixes
+
+- Paginated query breaks on json columns with postgres
+
+### 📚 Documentation
+
+- Update CHANGELOG.md for 1.1.5
+
+### 🚜 Refactor
+
+- Comparisons from the foundation vocabulary
+
+### ⚙️ Miscellaneous Tasks
+
+- Phpstan max level
 ## [1.1.5] - 2026-08-20
 
 ### 🚀 Features
@@ -19,26 +36,26 @@
 - Update CHANGELOG.md for 1.1.3
 ## [1.1.3] - 2026-02-05
 
-### 💼 Other
-
-- Symfony 8 compatibility
-
 ### 📚 Documentation
 
 - Update CHANGELOG.md for 1.1.2
+
+### 💼 Other
+
+- Symfony 8 compatibility
 ## [1.1.2] - 2026-01-11
 
 ### 🐛 Bug Fixes
 
 - Remove property declaration from trait to avoid conflict
 
-### 🚜 Refactor
-
-- Rm unused class
-
 ### 📚 Documentation
 
 - Update CHANGELOG.md for 1.1.1
+
+### 🚜 Refactor
+
+- Rm unused class
 ## [1.1.1] - 2026-01-11
 
 ### 🐛 Bug Fixes
