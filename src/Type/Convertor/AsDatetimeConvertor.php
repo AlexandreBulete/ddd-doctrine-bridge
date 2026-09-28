@@ -29,14 +29,18 @@ trait AsDatetimeConvertor
             ));
         }
 
+        if (!$value instanceof \DateTimeImmutable && !is_string($value)) {
+            throw new \UnexpectedValueException(sprintf('Cannot hydrate %s from %s.', $this->voClass, get_debug_type($value)));
+        }
+
         $dateTime = $value instanceof \DateTimeImmutable
             ? $value
-            : \DateTimeImmutable::createFromFormat('!' . $platform->getDateFormatString(), (string) $value);
+            : \DateTimeImmutable::createFromFormat('!' . $platform->getDateFormatString(), $value);
 
         if ($dateTime === false) {
             throw new \UnexpectedValueException(sprintf(
                 'Cannot hydrate "%s" as %s (expected format %s).',
-                (string) $value,
+                $value,
                 $this->voClass,
                 $platform->getDateFormatString(),
             ));

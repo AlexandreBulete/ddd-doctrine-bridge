@@ -43,7 +43,7 @@ final readonly class DoctrinePaginator implements PaginatorInterface
             return 1;
         }
 
-        return (int) ceil($this->totalItems / $this->itemsPerPage) ?: 1;
+        return max(1, (int) ceil($this->totalItems / $this->itemsPerPage));
     }
 
     public function getTotalItems(): int

@@ -1,0 +1,17 @@
+includes:
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+
+parameters:
+    level: max
+    paths:
+        - src
+        - tests
+
+    ignoreErrors:
+        # DispatchesDomainEvents requires the using class to declare an
+        # `$eventDispatcher` property — a contract PHP cannot express on a
+        # trait. The isset() is the runtime guard for a class that forgot it;
+        # analysed in a class that has it, PHPStan sees it as always true.
+        -
+            identifier: isset.property
+            path: src/DispatchesDomainEvents.php

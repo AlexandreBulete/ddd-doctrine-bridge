@@ -12,7 +12,7 @@ trait AsIdentifierConvertor
 {
     protected string $voClass;
 
-    public function convertToPHPValue($value, AbstractPlatform $platform): ?IdentifierVO
+    public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ?IdentifierVO
     {
         if ($value === null) {
             return null;
@@ -22,14 +22,18 @@ trait AsIdentifierConvertor
             throw new \InvalidArgumentException('Value class not set for ' . static::class);
         }
 
-        if (!class_exists($this->voClass)) {
-            throw new \InvalidArgumentException('Invalid value class: ' . $this->voClass);
+        if (!is_a($this->voClass, IdentifierVO::class, true)) {
+            throw new \InvalidArgumentException(sprintf('Invalid value class "%s": must extend %s.', $this->voClass, IdentifierVO::class));
+        }
+
+        if (!is_string($value)) {
+            throw new \UnexpectedValueException(sprintf('Cannot hydrate %s from %s.', $this->voClass, get_debug_type($value)));
         }
 
         return $this->voClass::fromString($value);
     }
 
-    public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
+    public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): ?string
     {
         if (is_string($value) || is_null($value)) {
             return $value;

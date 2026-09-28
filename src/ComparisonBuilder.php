@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
@@ -33,7 +33,7 @@ final class ComparisonBuilder
         return in_array($type, self::VALUELESS_TYPES, true);
     }
 
-    public function build(string $type, string $field, $param, $value): QueryBuilder
+    public function build(string $type, string $field, string $param, mixed $value): QueryBuilder
     {
         match ($type) {
             // No parameter bound on purpose: SQL compares against NULL with a
@@ -78,11 +78,11 @@ final class ComparisonBuilder
 
             'contains', 'like' => $this->queryBuilder
                 ->andWhere($this->queryBuilder->expr()->like($field, ":$param"))
-                ->setParameter($param, "%{$value}%"),
+                ->setParameter($param, "%" . self::likeOperand($value) . "%"),
 
             'not_contains', 'not_like' => $this->queryBuilder
                 ->andWhere($this->queryBuilder->expr()->notLike($field, ":$param"))
-                ->setParameter($param, "%{$value}%"),
+                ->setParameter($param, "%" . self::likeOperand($value) . "%"),
 
             'member_of', 'member_in' => $this->queryBuilder
                 ->andWhere($this->queryBuilder->expr()->isMemberOf($field, ":$param"))
@@ -90,15 +90,28 @@ final class ComparisonBuilder
 
             'starts_with', 'startswith' => $this->queryBuilder
                 ->andWhere($this->queryBuilder->expr()->like($field, ":$param"))
-                ->setParameter($param, "{$value}%"),
+                ->setParameter($param, self::likeOperand($value) . "%"),
 
             'ends_with', 'endswith' => $this->queryBuilder
                 ->andWhere($this->queryBuilder->expr()->like($field, ":$param"))
-                ->setParameter($param, "%{$value}"),
+                ->setParameter($param, "%" . self::likeOperand($value)),
 
             default => throw new \InvalidArgumentException(sprintf('Unsupported filter type "%s" for "%s"', $type, $field)),
         };
 
         return $this->queryBuilder;
+    }
+
+    /**
+     * A LIKE pattern is built by concatenation, so the operand has to be text:
+     * an array or an object would otherwise turn into "Array" or a fatal error.
+     */
+    private static function likeOperand(mixed $value): string
+    {
+        if (is_string($value) || is_int($value) || is_float($value) || $value instanceof \Stringable) {
+            return (string) $value;
+        }
+
+        throw new \InvalidArgumentException(sprintf('A LIKE filter needs a string operand, %s given.', get_debug_type($value)));
     }
 }
