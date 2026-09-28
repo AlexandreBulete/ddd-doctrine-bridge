@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AlexandreBulete\DddDoctrineBridge;
 
+use AlexandreBulete\DddFoundation\Domain\Repository\Comparison;
 use AlexandreBulete\DddFoundation\Domain\Repository\PaginatorInterface;
 use AlexandreBulete\DddFoundation\Domain\Repository\RepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -146,24 +147,16 @@ abstract class DoctrineRepository implements RepositoryInterface
         $cloned = clone $this;
 
         foreach ($filter as $key => $criterion) {
-            $type  = is_array($criterion) ? ($criterion['type'] ?? 'equals') : 'equals';
-            $value = is_array($criterion) ? ($criterion['value'] ?? null) : $criterion;
+            $criterion = Comparison::parse($criterion);
 
-            if (!is_string($type)) {
-                throw new \InvalidArgumentException(sprintf('Filter type for "%s" must be a string, %s given.', $key, get_debug_type($type)));
-            }
-
-            // An empty value means "filter left blank" and is skipped — except
+            // A blank value means "filter left blank" and is skipped — except
             // for null-ness assertions, whose whole point is to carry no operand.
-            if (!ComparisonBuilder::isValueless($type) && ($value === null || $value === '')) {
+            if (Comparison::isBlank($criterion)) {
                 continue;
             }
 
-            $field = sprintf('%s.%s', $cloned->getAlias(), $key);
-            $param = $key;
-
             $cloned->queryBuilder = (new ComparisonBuilder($cloned->queryBuilder))
-                ->build($type, $field, $param, $value);
+                ->build($criterion['type'], sprintf('%s.%s', $cloned->getAlias(), $key), $key, $criterion['value']);
         }
 
         return $cloned;
