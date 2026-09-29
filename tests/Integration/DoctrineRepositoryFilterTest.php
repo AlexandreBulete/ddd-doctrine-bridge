@@ -74,6 +74,18 @@ final class DoctrineRepositoryFilterTest extends TestCase
     }
 
     #[Test]
+    public function a_subclass_can_constrain_beyond_the_vocabulary(): void
+    {
+        $titles = [];
+        foreach ($this->repository->titledEither('alpha', 'delta')->filter(['title' => ['type' => 'neq', 'value' => 'delta']]) as $article) {
+            $titles[] = $article->title;
+        }
+
+        self::assertSame(['alpha'], $titles, 'the constraint combines with filters');
+        self::assertCount(4, $this->repository, 'the original is untouched');
+    }
+
+    #[Test]
     public function an_unknown_comparison_is_rejected(): void
     {
         $this->expectException(\InvalidArgumentException::class);

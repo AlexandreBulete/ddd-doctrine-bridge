@@ -183,6 +183,21 @@ abstract class DoctrineRepository implements RepositoryInterface
         return $cloned;
     }
 
+    /**
+     * A clone restricted by a condition the filter vocabulary cannot express —
+     * an OR across fields, a subquery. For subclasses, which own their
+     * queries; the constraint receives the query builder and the root alias.
+     *
+     * @param \Closure(QueryBuilder, string): void $constraint
+     */
+    protected function constrained(\Closure $constraint): static
+    {
+        $cloned = clone $this;
+        $constraint($cloned->queryBuilder, $cloned->getAlias());
+
+        return $cloned;
+    }
+
     private function getAlias(): string
     {
         return $this->queryBuilder->getRootAliases()[0];

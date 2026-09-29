@@ -8,6 +8,7 @@ use AlexandreBulete\DddDoctrineBridge\Capability\AsCrudable;
 use AlexandreBulete\DddDoctrineBridge\DoctrineRepository;
 use AlexandreBulete\DddFoundation\Domain\ValueObject\IdentifierVO;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * Uses AsCrudable on purpose: it is how the capability traits get exercised —
@@ -52,6 +53,18 @@ final class ArticleRepository extends DoctrineRepository
     public function everything(): array
     {
         return $this->findAllEntities();
+    }
+
+    /**
+     * An OR the filter vocabulary cannot express.
+     */
+    public function titledEither(string $one, string $other): self
+    {
+        return $this->constrained(static function (QueryBuilder $qb, string $alias) use ($one, $other): void {
+            $qb->andWhere($qb->expr()->orX("{$alias}.title = :one", "{$alias}.title = :other"))
+                ->setParameter('one', $one)
+                ->setParameter('other', $other);
+        });
     }
 
     public function dispatcher(): RecordingDispatcher
