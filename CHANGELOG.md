@@ -1,3 +1,12 @@
+## [1.3.0] - 2026-09-29
+
+### 🚀 Features
+
+- Constrained queries for subclasses
+
+### 📚 Documentation
+
+- Update CHANGELOG.md for 1.2.0
 ## [1.2.0] - 2026-09-28
 
 ### 🐛 Bug Fixes
