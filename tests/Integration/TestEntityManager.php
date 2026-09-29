@@ -32,9 +32,7 @@ final class TestEntityManager
         ]))->parse(is_string($url) && $url !== '' ? $url : 'pdo-sqlite:///:memory:');
 
         $config = ORMSetup::createAttributeMetadataConfig([__DIR__ . '/Fixture'], true);
-        if (\PHP_VERSION_ID >= 80400) {
-            $config->enableNativeLazyObjects(true);
-        }
+        $config->enableNativeLazyObjects(true);
 
         $em = new EntityManager(DriverManager::getConnection($params, $config), $config);
 

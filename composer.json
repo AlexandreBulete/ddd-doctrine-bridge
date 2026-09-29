@@ -9,7 +9,7 @@
         }
     ],
     "require": {
-        "php": "^8.2",
+        "php": "^8.4",
         "alexandrebulete/ddd-foundation": "^1.2",
         "doctrine/orm": "^3.6 || ^4.0",
         "doctrine/dbal": "^3.10 || ^4.0",
